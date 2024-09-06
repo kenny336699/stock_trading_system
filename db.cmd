@@ -1,0 +1,1 @@
+docker run -d --name stock_trading_db -e MYSQL_ROOT_PASSWORD=P@ssw0rd -e MYSQL_DATABASE=stock_trading_system -p 3306:3306 mariadb:latest

@@ -83,8 +83,8 @@ CREATE TABLE password_reset_tokens (
 INSERT INTO users (username, password_hash, email, full_name, balance)
 VALUES ('john_doe', SHA2('123456', 256), 'john999@yopmail.com', 'John Doe', 10000.00);
 
-INSERT INTO admnis (username, password_hash, email, full_name, balance, account_status)
-VALUES ('admin_user', SHA2('123456', 256), 'admin999@yopmail.com', 'Admin User', 0.00, 'active');
+INSERT INTO admins (username, password_hash)
+VALUES ('admin_user', SHA2('123456', 256));
 
 INSERT INTO stocks (symbol, name, current_price) VALUES
 ('AAPL', 'Apple Inc.', 150.25),
