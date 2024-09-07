@@ -5,14 +5,15 @@ import fs from "fs";
 dotenv.config();
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  connectionLimit: 10,
+  host: "localhost",
+  user: "user01",
+  password: "P@ssw0rd",
+  database: "stock_trading_system",
+  port: 3306,
   ssl: {
-    rejectUnauthorized: true,
-    ca: fs.readFileSync("/path/to/ca-certificate.pem"),
+    ca: fs.readFileSync("../ssl/ca-cert.pem"),
+    cert: fs.readFileSync("../ssl/client-cert.pem"),
+    key: fs.readFileSync("../ssl/client-key.pem"),
   },
 });
 

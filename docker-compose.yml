@@ -5,10 +5,10 @@ services:
     image: mariadb:10.5 # The official MariaDB image
     container_name: mariadb_container # Name of the container
     environment:
-      - MYSQL_ROOT_PASSWORD=your_root_password # Set the root password for MariaDB
-      - MYSQL_DATABASE=your_database_name # Optional: Define a default database
-      - MYSQL_USER=your_user # Optional: Define a custom user
-      - MYSQL_PASSWORD=your_user_password # Optional: Define the custom user's password
+      - MYSQL_ROOT_PASSWORD=P@ssw0rd # Set the root password for MariaDB
+      - MYSQL_DATABASE=stock_trading_system # Optional: Define a default database
+      - MYSQL_USER=user01 # Optional: Define a custom user
+      - MYSQL_PASSWORD=P@ssw0rd # Optional: Define the custom user's password
     ports:
       - "3306:3306" # Map the MariaDB port to the host machine's port 3306
     volumes:

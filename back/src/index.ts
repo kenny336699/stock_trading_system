@@ -1,12 +1,17 @@
 import express from "express";
+import dotenv from "dotenv";
+import authRoutes from "./routes/auth";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello, TypeScript with Expreddds!");
-});
+app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// Use authentication routes
+app.use("/api/auth", authRoutes);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

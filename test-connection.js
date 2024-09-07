@@ -3,14 +3,14 @@ const fs = require("fs");
 
 const connection = mysql.createConnection({
   host: "localhost",
-  user: "your_user",
-  password: "your_user_password",
-  database: "your_database_name",
+  user: "user01",
+  password: "P@ssw0rd",
+  database: "stock_trading_system",
   port: 3306,
   ssl: {
     ca: fs.readFileSync("./ssl/ca-cert.pem"),
-    cert: fs.readFileSync("./ssl/server-cert.pem"),
-    key: fs.readFileSync("./ssl/server-key.pem"),
+    cert: fs.readFileSync("./ssl/client-cert.pem"),
+    key: fs.readFileSync("./ssl/client-key.pem"),
   },
 });
 
