@@ -3,9 +3,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.model";
 import { sendEmail } from "../util/email";
+
 const generateVerificationCode = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, password, email, fullName } = req.body;
@@ -16,9 +18,12 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Hash password
+    // Generate a unique salt
     const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    const salt = await bcrypt.genSalt(saltRounds);
+
+    // Hash password with the unique salt
+    const passwordHash = await bcrypt.hash(password, salt);
 
     // Create new user
     const userId = await UserModel.create(
@@ -75,16 +80,9 @@ export const login = async (req: Request, res: Response) => {
 
     await sendEmail(user.email, emailSubject, emailText);
 
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
-
     res.json({
       message: "Verification code sent to your email",
-      token,
-      user: { id: user.id, username: user.username, email: user.email },
+      userId: user.id,
       requiresVerification: true,
     });
   } catch (error) {
@@ -92,6 +90,7 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: "An error occurred during login" });
   }
 };
+
 export const verifyCode = async (req: Request, res: Response) => {
   try {
     const { userId, code } = req.body;
@@ -110,7 +109,31 @@ export const verifyCode = async (req: Request, res: Response) => {
 
     if (code === storedCode) {
       await UserModel.clearVerificationCode(userId);
-      res.json({ message: "Verification successful", verified: true });
+
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+      );
+
+      const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        full_name: user.full_name,
+        balance: user.balance,
+        last_login: user.last_login,
+        account_status: user.account_status,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      };
+
+      res.json({
+        message: "Verification successful",
+        verified: true,
+        token,
+        user: userData,
+      });
     } else {
       res
         .status(400)
