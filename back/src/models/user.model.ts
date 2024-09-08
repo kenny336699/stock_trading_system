@@ -45,4 +45,39 @@ export class UserModel {
       [id]
     );
   }
+  static async storeVerificationCode(
+    userId: number,
+    code: string,
+    expiresIn: number = 600
+  ): Promise<void> {
+    const expiresAt = new Date(Date.now() + expiresIn * 1000); // Default to 10 minutes (600 seconds)
+    await pool.query(
+      "UPDATE users SET mfa_secret = ?, mfa_expires_at = ? WHERE id = ?",
+      [code, expiresAt, userId]
+    );
+  }
+
+  static async getVerificationCode(userId: number): Promise<string | null> {
+    const [rows] = await pool.query<User[]>(
+      "SELECT mfa_secret FROM users WHERE id = ? AND mfa_expires_at > CURRENT_TIMESTAMP",
+      [userId]
+    );
+    console.log(userId, rows);
+    return rows[0]?.mfa_secret || null;
+  }
+
+  static async clearVerificationCode(userId: number): Promise<void> {
+    await pool.query(
+      "UPDATE users SET mfa_secret = NULL, mfa_expires_at = NULL WHERE id = ?",
+      [userId]
+    );
+  }
+
+  static async findById(id: number): Promise<User | null> {
+    const [rows] = await pool.query<User[]>(
+      "SELECT * FROM users WHERE id = ?",
+      [id]
+    );
+    return rows[0] || null;
+  }
 }

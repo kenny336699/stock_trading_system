@@ -1,10 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import authRoutes from "./routes/auth";
 
 dotenv.config();
 
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.use(express.json());
 
