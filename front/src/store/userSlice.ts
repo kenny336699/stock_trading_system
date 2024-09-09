@@ -87,7 +87,8 @@ export const loginUser = createAsyncThunk(
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        // Reject with the full error data object, which contains both message and errorCode
+        return rejectWithValue(errorData);
       }
 
       const data = await response.json();
@@ -97,9 +98,9 @@ export const loginUser = createAsyncThunk(
       } as LoginResponse;
     } catch (error) {
       if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({ message: error.message });
       }
-      return rejectWithValue("Login failed");
+      return rejectWithValue({ message: "Login failed" });
     }
   }
 );
@@ -166,7 +167,16 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        switch (action.payload) {
+          case "INVALID_CREDENTIALS":
+            state.error = "Incorrect username or password";
+            break;
+          case "ACCOUNT_INACTIVE":
+            state.error = "Your account is inactive. Please contact support.";
+            break;
+          default:
+            state.error = "Login failed. Please try again.";
+        }
       })
       .addCase(verifyCode.pending, (state) => {
         state.isLoading = true;

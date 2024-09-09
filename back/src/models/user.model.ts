@@ -1,5 +1,3 @@
-// src/models/User.ts
-
 import pool from "../config/db";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 
@@ -15,8 +13,9 @@ export interface User extends RowDataPacket {
   account_status: "active" | "suspended" | "inactive";
   created_at: Date;
   updated_at: Date;
+  failedLoginAttempts: number; // Make sure to add this field to the user model interface
 }
-//
+
 export class UserModel {
   static async findByUsername(username: string): Promise<User | null> {
     const [rows] = await pool.query<User[]>(
@@ -45,6 +44,7 @@ export class UserModel {
       [id]
     );
   }
+
   static async storeVerificationCode(
     userId: number,
     code: string,
@@ -79,5 +79,33 @@ export class UserModel {
       [id]
     );
     return rows[0] || null;
+  }
+
+  // Add the following methods to manage failed login attempts and account status
+
+  // Increment failed login attempts
+  static async incrementFailedLoginAttempts(userId: number): Promise<void> {
+    await pool.query(
+      "UPDATE users SET failedLoginAttempts = failedLoginAttempts + 1 WHERE id = ?",
+      [userId]
+    );
+  }
+
+  // Reset failed login attempts after successful login
+  static async resetFailedLoginAttempts(userId: number): Promise<void> {
+    await pool.query("UPDATE users SET failedLoginAttempts = 0 WHERE id = ?", [
+      userId,
+    ]);
+  }
+
+  // Update the account status (active, suspended, or inactive)
+  static async updateAccountStatus(
+    userId: number,
+    status: "active" | "suspended" | "inactive"
+  ): Promise<void> {
+    await pool.query("UPDATE users SET account_status = ? WHERE id = ?", [
+      status,
+      userId,
+    ]);
   }
 }

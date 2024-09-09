@@ -26,6 +26,7 @@ const Home: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isLoading, error, userId } = useAppSelector((state) => state.user);
 
+  // Function to validate input based on type
   const validateInput = (
     input: string,
     type: "username" | "password" | "email" | "fullName"
@@ -41,7 +42,7 @@ const Home: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!captchaValue) {
+    if (!captchaValue && activeForm !== "verify") {
       alert("Please complete the reCAPTCHA");
       return;
     }
@@ -92,10 +93,14 @@ const Home: React.FC = () => {
         );
       }
     } else if (result?.meta.requestStatus === "rejected") {
-      alert(result.payload);
+      // Use the message returned by the server
+      const errorMessage =
+        result.payload.message || "An unexpected error occurred";
+      alert(errorMessage);
     }
   };
 
+  // Render the correct form based on the active form state
   const renderForm = () => {
     const formFields = {
       login: [
