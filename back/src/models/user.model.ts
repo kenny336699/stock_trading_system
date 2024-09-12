@@ -108,4 +108,10 @@ export class UserModel {
       userId,
     ]);
   }
+  static async fetchAllUsers(): Promise<User[]> {
+    const [rows] = await pool.query<User[]>(
+      "SELECT id, username, email, full_name, balance, last_login, account_status, created_at, updated_at, failedLoginAttempts FROM users"
+    );
+    return rows;
+  }
 }

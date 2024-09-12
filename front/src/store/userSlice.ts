@@ -178,6 +178,7 @@ const userSlice = createSlice({
       state.currentUser = null;
       state.requiresVerification = false;
       state.userId = null;
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     },
@@ -197,7 +198,6 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.requiresVerification = true;
-        console.log("action.payload.userId;", action.payload.userId);
         state.userId = action.payload.userId;
         state.error = null;
       })

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { getUserById } from "./userSlice";
+import { getUserById, logout } from "./userSlice";
 
 interface Stock {
   id: number;
@@ -237,6 +237,9 @@ const stockSlice = createSlice({
       .addCase(fetchUserStocks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(logout, (state) => {
+        state.userStocks = []; // Clear user stocks when logging out
       });
   },
 });

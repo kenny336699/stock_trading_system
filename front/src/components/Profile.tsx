@@ -14,12 +14,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const UserProfile: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const userStocks = useSelector((state: RootState) => state.stock.userStocks);
-  const loading = useSelector((state: RootState) => state.stock.loading);
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  const userStocks = useAppSelector(
+    (state: RootState) => state.stock.userStocks
+  );
+  const loading = useAppSelector((state: RootState) => state.stock.loading);
 
   useEffect(() => {
     if (currentUser) {

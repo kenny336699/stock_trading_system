@@ -1,4 +1,4 @@
-import React, { useId, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -13,8 +13,8 @@ const Auth: React.FC = () => {
     "login"
   );
   const [loginData, setLoginData] = useState({
-    username: "newuser2",
-    password: "P@ssw0rd",
+    username: "",
+    password: "",
   });
   const [registerData, setRegisterData] = useState({
     username: "",
@@ -46,7 +46,6 @@ const Auth: React.FC = () => {
     };
     return patterns[type].test(input);
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setShowValidation(true);
@@ -67,6 +66,11 @@ const Auth: React.FC = () => {
           return;
         }
         result = await dispatch(loginUser(loginData));
+        if (result.meta.requestStatus === "rejected") {
+          alert("Login failed. Please try again.");
+          window.location.reload(); // Reload the window if login fails
+          return;
+        }
         break;
       case "register":
         if (
@@ -96,7 +100,6 @@ const Auth: React.FC = () => {
         setActiveForm("verify");
       } else {
         if (activeForm === "verify" || activeForm === "register") {
-          console.log("12312312");
           // Redirect to home page after successful verification or registration
           navigate("/");
         } else {
@@ -107,6 +110,9 @@ const Auth: React.FC = () => {
       const errorMessage =
         result.payload.message || "An unexpected error occurred";
       alert(errorMessage);
+      if (activeForm === "login") {
+        window.location.reload(); // Reload the window if login fails
+      }
     }
   };
 
@@ -260,6 +266,25 @@ const Auth: React.FC = () => {
     );
   };
 
+  const resetForm = () => {
+    setLoginData({ username: "", password: "" });
+    setRegisterData({
+      username: "",
+      email: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setCaptchaValue(null);
+    setShowValidation(false);
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
+  };
+
+  useEffect(() => {
+    resetForm();
+  }, [activeForm]);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       {renderForm()}
@@ -274,7 +299,6 @@ const Auth: React.FC = () => {
             variant="link"
             onClick={() => {
               setActiveForm(activeForm === "login" ? "register" : "login");
-              setShowValidation(false);
             }}
             className="text-orange-500 hover:text-orange-600 transition duration-300"
           >
@@ -287,5 +311,4 @@ const Auth: React.FC = () => {
     </div>
   );
 };
-
 export default Auth;

@@ -1,12 +1,18 @@
+// src/middleware/auth.middleware.ts
+
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-interface AuthRequest extends Request {
-  user?: any;
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId?: number;
+    adminId?: number;
+    username: string;
+  };
 }
 
 export const authenticateJWT = (
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -20,7 +26,11 @@ export const authenticateJWT = (
         return res.sendStatus(403);
       }
 
-      req.user = user;
+      req.user = user as {
+        userId?: number;
+        adminId?: number;
+        username: string;
+      };
       next();
     });
   } else {
