@@ -13,7 +13,7 @@ services:
       - "3306:3306" # Map the MariaDB port to the host machine's port 3306
     volumes:
       - ./ssl:/etc/mysql/certs # Mount the SSL certificate directory
-    command: >
+    commzxzand: >
       mysqld
       --ssl-ca=/etc/mysql/certs/ca-cert.pem
       --ssl-cert=/etc/mysql/certs/server-cert.pem

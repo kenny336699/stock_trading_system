@@ -1,18 +1,22 @@
 USE stock_trading_system;
-
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    balance DECIMAL(15, 2) DEFAULT 0.00,
-    mfa_secret VARCHAR(32),
-    last_login TIMESTAMP,
-    account_status ENUM('active', 'suspended', 'inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `balance` decimal(15,2) DEFAULT 0.00,
+  `mfa_secret` varchar(32) DEFAULT NULL,
+  `last_login` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `account_status` enum('active','suspended','inactive') DEFAULT 'active',
+  `failedLoginAttempts` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `mfa_expires_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 CREATE TABLE admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -39,52 +43,10 @@ CREATE TABLE user_stocks (
     UNIQUE KEY user_stock_unique (user_id, stock_id)
 );
 
-CREATE TABLE transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    stock_id INT NOT NULL,
-    type ENUM('buy', 'sell') NOT NULL,
-    quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (stock_id) REFERENCES stocks(id)
-);
 
-CREATE TABLE login_attempts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    ip_address VARCHAR(45) NOT NULL,
-    attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    success BOOLEAN NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
-CREATE TABLE security_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    action VARCHAR(100) NOT NULL,
-    details TEXT,
-    ip_address VARCHAR(45),
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
-CREATE TABLE password_reset_tokens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    expiry TIMESTAMP NOT NULL,
-    used BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
-INSERT INTO users (username, password_hash, email, full_name, balance)
-VALUES ('john_doe', SHA2('123456', 256), 'john999@yopmail.com', 'John Doe', 10000.00);
-
-INSERT INTO admins (username, password_hash)
-VALUES ('admin_user', SHA2('123456', 256));
 
 INSERT INTO stocks (symbol, name, current_price) VALUES
 ('AAPL', 'Apple Inc.', 150.25),

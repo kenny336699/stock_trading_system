@@ -16,12 +16,13 @@ export const register = async (req: Request, res: Response) => {
     // Check if user already exists
     const existingUser = await UserModel.findByUsername(username);
     if (existingUser) {
+      console.log("req1", req.body);
       return res.status(400).json({
         message: "Username already exists",
         errorCode: "USERNAME_EXISTS",
       });
     }
-
+    console.log("req1", req.body);
     // Generate a unique salt and hash the password
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -34,14 +35,14 @@ export const register = async (req: Request, res: Response) => {
       email,
       fullName
     );
-
+    console.log("req2", req.body);
     // Generate JWT token
     const token = jwt.sign(
       { userId, username },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
-
+    console.log("req3", req.body);
     // Send response
     res.status(201).json({
       message: "User registered successfully",

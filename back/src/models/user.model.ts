@@ -18,10 +18,12 @@ export interface User extends RowDataPacket {
 
 export class UserModel {
   static async findByUsername(username: string): Promise<User | null> {
+    console.log("req", username);
     const [rows] = await pool.query<User[]>(
       "SELECT * FROM users WHERE username = ?",
       [username]
     );
+    console.log("dfafds", [rows]);
     return rows[0] || null;
   }
 
