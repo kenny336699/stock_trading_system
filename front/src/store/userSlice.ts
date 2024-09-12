@@ -33,6 +33,41 @@ interface LoginResponse {
   userId: number;
   requiresVerification: boolean;
 }
+export const getUserById = createAsyncThunk(
+  "user/getUserById",
+  async (userId: number, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const response = await fetch(
+        `http://localhost:3000/api/auth/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch user data");
+      }
+
+      const userData = await response.json();
+      return userData;
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Failed to fetch user data");
+    }
+  }
+);
 export const registerUser = createAsyncThunk(
   "user/register",
   async (
@@ -162,6 +197,7 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.requiresVerification = true;
+        console.log("action.payload.userId;", action.payload.userId);
         state.userId = action.payload.userId;
         state.error = null;
       })
@@ -193,8 +229,21 @@ const userSlice = createSlice({
       .addCase(verifyCode.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+      .addCase(getUserById.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getUserById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentUser = action.payload;
+        state.error = null;
+        localStorage.setItem("user", JSON.stringify(action.payload));
+      })
+      .addCase(getUserById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       });
-    // ... (registerUser cases remain the same)
   },
 });
 

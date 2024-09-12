@@ -1,29 +1,24 @@
 import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import { Link, useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
-import { logout } from "@/store/userSlice"; // Adjust this import path as needed
+import { logout } from "@/store/userSlice";
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
+      setIsSticky(window.scrollY > 0);
     };
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -31,6 +26,7 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate("/");
   };
 
   return (
@@ -47,7 +43,7 @@ const Header = () => {
           </nav>
         </div>
         <div className="flex items-center space-x-4">
-          {currentUser && (
+          {currentUser ? (
             <>
               <span className="text-sm font-medium">
                 Welcome, {currentUser.full_name}
@@ -62,6 +58,13 @@ const Header = () => {
                 Logout
               </Button>
             </>
+          ) : (
+            <Link to="/auth">
+              <Button variant="ghost" size="sm" className="flex items-center">
+                <LogIn className="h-4 w-4 mr-2" />
+                Login
+              </Button>
+            </Link>
           )}
         </div>
       </div>

@@ -15,7 +15,7 @@ export const initializeAuth = (dispatch: AppDispatch) => {
   });
 
   // Start the inactivity check
-  setInterval(() => checkInactivity(dispatch), 60000); // Check every minute
+  setInterval(() => checkInactivity(dispatch), 1200000); // Check every minute
 };
 
 const checkInactivity = (dispatch: AppDispatch) => {

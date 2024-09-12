@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Header from "./components/Header";
 import { useAppDispatch } from "./store/hooks";
 import { initializeAuth } from "./util/authUtils";
+import Auth from "./pages/Auth";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/auth" element={<Auth />} />
           </Routes>
         </main>
       </div>

@@ -196,3 +196,59 @@ export const verifyCode = async (req: Request, res: Response) => {
     });
   }
 };
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: number;
+    username: string;
+  };
+}
+
+export const getUserById = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        message: "Invalid user ID",
+        errorCode: "INVALID_USER_ID",
+      });
+    }
+
+    // Check if the requesting user is the same as the requested user
+    if (req.user?.userId !== userId) {
+      return res.status(403).json({
+        message: "Unauthorized access",
+        errorCode: "UNAUTHORIZED_ACCESS",
+      });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        errorCode: "USER_NOT_FOUND",
+      });
+    }
+
+    const userData = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      full_name: user.full_name,
+      balance: user.balance,
+      last_login: user.last_login,
+      account_status: user.account_status,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
+
+    res.json(userData);
+  } catch (error) {
+    console.error("Get user error:", error);
+    res.status(500).json({
+      message: "An error occurred while fetching user data",
+      errorCode: "GET_USER_ERROR",
+    });
+  }
+};
