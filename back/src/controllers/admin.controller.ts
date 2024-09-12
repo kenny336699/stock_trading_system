@@ -63,6 +63,9 @@ export const updateUserStatus = async (req: Request, res: Response) => {
     }
 
     await AdminModel.updateUserStatus(userId, status);
+    if (status === "active") {
+      await UserModel.resetFailedLoginAttempts(userId);
+    }
 
     res.json({
       message: "User status updated successfully",

@@ -50,7 +50,7 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setShowValidation(true);
 
-    if (!captchaValue && activeForm !== "verify") {
+    if (!captchaValue && activeForm == "login") {
       alert("Please complete the reCAPTCHA");
       return;
     }
@@ -58,6 +58,10 @@ const Auth: React.FC = () => {
     let result;
     switch (activeForm) {
       case "login":
+        if (!captchaValue) {
+          alert("Please complete the reCAPTCHA");
+          return;
+        }
         if (
           !validateInput(loginData.username, "username") ||
           !validateInput(loginData.password, "password")
@@ -67,7 +71,8 @@ const Auth: React.FC = () => {
         }
         result = await dispatch(loginUser(loginData));
         if (result.meta.requestStatus === "rejected") {
-          alert("Login failed. Please try again.");
+          const errorMessage = (result.payload as { message: string }).message;
+          alert(errorMessage || "Login failed. Please try again.");
           window.location.reload(); // Reload the window if login fails
           return;
         }
@@ -197,7 +202,7 @@ const Auth: React.FC = () => {
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
-            {activeForm !== "verify" && (
+            {activeForm !== "verify" && activeForm !== "login" && (
               <p className="text-xs text-gray-500 mt-1">
                 {helperText[field.name as keyof typeof helperText]}
               </p>
@@ -240,10 +245,10 @@ const Auth: React.FC = () => {
               )}
           </div>
         ))}
-        {activeForm !== "verify" && (
+        {activeForm === "login" && (
           <ReCAPTCHA
             ref={recaptchaRef}
-            sitekey="6LfIFjkqAAAAAKd0tlyWVHBv5De3Knb0htSMJu6w"
+            sitekey=""
             onChange={(value) => setCaptchaValue(value)}
             className="flex justify-center"
           />
@@ -252,7 +257,12 @@ const Auth: React.FC = () => {
         <Button
           type="submit"
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
-          disabled={isLoading || (!captchaValue && activeForm !== "verify")}
+          disabled={
+            isLoading ||
+            (!captchaValue &&
+              activeForm !== "register" &&
+              activeForm !== "verify")
+          }
         >
           {isLoading
             ? "Processing..."
@@ -265,7 +275,12 @@ const Auth: React.FC = () => {
       </motion.form>
     );
   };
-
+  const resetCaptcha = () => {
+    setCaptchaValue(null);
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
+  };
   const resetForm = () => {
     setLoginData({ username: "", password: "" });
     setRegisterData({
@@ -275,13 +290,9 @@ const Auth: React.FC = () => {
       password: "",
       confirmPassword: "",
     });
-    setCaptchaValue(null);
     setShowValidation(false);
-    if (recaptchaRef.current) {
-      recaptchaRef.current.reset();
-    }
+    resetCaptcha();
   };
-
   useEffect(() => {
     resetForm();
   }, [activeForm]);

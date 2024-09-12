@@ -56,7 +56,6 @@ const AdminDashboard: React.FC = () => {
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
-                      <option value="suspended">Suspended</option>
                     </select>
                   </td>
                 </tr>
