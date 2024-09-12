@@ -1,4 +1,4 @@
-import React, from "react";
+import React from "react";
 
 import StockList from "@/components/StockList";
 import UserProfile from "@/components/Profile";

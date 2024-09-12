@@ -6,7 +6,6 @@ interface Stock {
   symbol: string;
   name: string;
   current_price: number;
-  // Add other stock properties as needed
 }
 
 export interface UserStock {
