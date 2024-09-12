@@ -32,8 +32,8 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="container space-y-6 mx-auto p-4">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>User Profile</CardTitle>
         </CardHeader>
@@ -53,7 +53,7 @@ const UserProfile: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Stock Holdings</CardTitle>
         </CardHeader>
